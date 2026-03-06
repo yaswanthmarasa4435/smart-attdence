@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Panel | SmartAttend</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="card auth-card" id="teacherLoginCard">
+      <h2>Teacher Login</h2>
+      <form id="teacherLoginForm">
+        <label>Email</label>
+        <input type="email" id="teacherEmail" required />
+        <label>Password</label>
+        <input type="password" id="teacherPassword" required />
+        <button class="btn" type="submit">Login</button>
+      </form>
+      <p class="muted small">Demo credentials: teacher@smartattend.com / 123456</p>
+    </section>
+
+    <section class="hidden" id="teacherDashboard">
+      <header class="top-row">
+        <h1>Teacher Dashboard</h1>
+        <button class="btn btn-outline" id="logoutTeacherBtn">Logout</button>
+      </header>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Active Session QR</h3>
+          <button class="btn" id="generateQrBtn">Generate QR (60s)</button>
+          <div id="qrcode" class="qr-box"></div>
+          <p id="qrTimer" class="muted">No active session</p>
+        </article>
+
+        <article class="card">
+          <h3>Session Stats</h3>
+          <div class="stat-row"><span>Present</span><strong id="presentCount">0</strong></div>
+          <div class="stat-row"><span>Late</span><strong id="lateCount">0</strong></div>
+          <div class="stat-row"><span>Absent</span><strong id="absentCount">0</strong></div>
+          <div class="stat-row"><span>Attendance %</span><strong id="attendancePercent">0%</strong></div>
+          <p id="warningText" class="warning hidden">Warning: Attendance is below 75%</p>
+        </article>
+      </div>
+
+      <article class="card mt-16">
+        <h3>Live Attendance Feed</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Device IP</th>
+              </tr>
+            </thead>
+            <tbody id="attendanceTableBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <script type="module" src="js/teacher.js"></script>
+</body>
+</html>

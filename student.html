@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Panel | SmartAttend</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="card auth-card" id="studentLoginCard">
+      <h2>Student Login</h2>
+      <form id="studentLoginForm">
+        <label>Student ID</label>
+        <input type="text" id="studentId" placeholder="e.g. STU001" required />
+        <label>Student Name</label>
+        <input type="text" id="studentName" required />
+        <button class="btn" type="submit">Continue</button>
+      </form>
+    </section>
+
+    <section class="hidden" id="studentPanel">
+      <header class="top-row">
+        <h1>Student Attendance</h1>
+        <button class="btn btn-outline" id="logoutStudentBtn">Logout</button>
+      </header>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>1) Scan Teacher QR</h3>
+          <div id="qr-reader"></div>
+          <p class="muted small">Allow camera permission to scan QR.</p>
+        </article>
+
+        <article class="card">
+          <h3>2) Face Verification</h3>
+          <video id="faceVideo" autoplay muted playsinline></video>
+          <button class="btn" id="verifyFaceBtn" disabled>Verify Face &amp; Mark Attendance</button>
+          <p id="studentStatus" class="muted">Scan a valid QR code first.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+  <script type="module" src="js/student.js"></script>
+</body>
+</html>

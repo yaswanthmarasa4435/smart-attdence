@@ -1,0 +1,165 @@
+:root {
+  --bg: #f4f4f4;
+  --card: #ffffff;
+  --text: #0f0f0f;
+  --muted: #666;
+  --border: #ddd;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Segoe UI, sans-serif;
+  color: var(--text);
+  background: linear-gradient(135deg, #ececec, #ffffff);
+  min-height: 100vh;
+}
+
+.container {
+  width: min(1100px, 92%);
+  margin: 32px auto;
+}
+
+.center-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.landing-card {
+  width: min(480px, 100%);
+  text-align: center;
+}
+
+.auth-card {
+  width: min(420px, 100%);
+  margin: 32px auto;
+}
+
+label {
+  display: block;
+  font-size: 0.9rem;
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff;
+}
+
+button,
+.btn {
+  display: inline-block;
+  margin-top: 16px;
+  background: #111;
+  color: #fff;
+  border: 1px solid #111;
+  border-radius: 10px;
+  padding: 10px 14px;
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-outline {
+  background: #fff;
+  color: #111;
+}
+
+.button-grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.grid-2 {
+  margin-top: 16px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.qr-box {
+  margin-top: 14px;
+  min-height: 140px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+#qr-reader {
+  width: 100%;
+}
+
+#faceVideo {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #000;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.warning {
+  color: #222;
+  background: #f1f1f1;
+  padding: 8px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.small {
+  font-size: 0.82rem;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.hidden {
+  display: none;
+}
