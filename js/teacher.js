@@ -50,23 +50,34 @@ generateQrBtn.addEventListener('click', async () => {
   const sessionId = crypto.randomUUID();
   const token = Math.random().toString(36).slice(2);
   const expiryMs = Date.now() + 60_000;
-
   const sessionDoc = doc(db, 'sessions', sessionId);
-  await setDoc(sessionDoc, {
-    token,
-    createdAt: serverTimestamp(),
-    expiresAt: expiryMs,
-    active: true,
-  });
 
   activeSession = { sessionId, token, expiryMs };
   renderQr(activeSession);
   startCountdown(expiryMs, sessionDoc);
   listenAttendance(sessionId);
+
+  try {
+    await setDoc(sessionDoc, {
+      token,
+      createdAt: serverTimestamp(),
+      expiresAt: expiryMs,
+      active: true,
+    });
+  } catch (error) {
+    console.error('Could not save session to Firestore:', error);
+    qrTimer.textContent = 'QR generated locally, but session was not saved to Firestore.';
+  }
 });
 
 function renderQr(payload) {
   qrContainer.innerHTML = '';
+
+  if (typeof QRCode === 'undefined') {
+    qrContainer.textContent = 'QR library failed to load.';
+    return;
+  }
+
   new QRCode(qrContainer, {
     text: JSON.stringify(payload),
     width: 180,
@@ -84,7 +95,11 @@ function startCountdown(expiryMs, sessionDoc) {
 
     if (left <= 0) {
       clearInterval(countdownRef);
-      await updateDoc(sessionDoc, { active: false });
+      try {
+        await updateDoc(sessionDoc, { active: false });
+      } catch (error) {
+        console.warn('Could not update session expiry in Firestore:', error);
+      }
     }
   }, 500);
 }
