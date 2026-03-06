@@ -49,6 +49,11 @@ studentLoginForm.addEventListener('submit', async (event) => {
   }
 
   adminStudentRecord = adminStudentSnap.data();
+  if (name && adminStudentRecord.name && name.toLowerCase() !== adminStudentRecord.name.toLowerCase()) {
+    alert('Entered name does not match admin record. Use registered student name.');
+    return;
+  }
+
   const profileRef = doc(db, 'studentProfiles', id);
   const profileSnap = await getDoc(profileRef);
 
@@ -76,7 +81,7 @@ studentLoginForm.addEventListener('submit', async (event) => {
 
     await setDoc(profileRef, {
       studentID: id,
-      name,
+      name: adminStudentRecord.name,
       email: adminStudentRecord.email,
       classSection: adminStudentRecord.classSection,
       password,
@@ -86,7 +91,7 @@ studentLoginForm.addEventListener('submit', async (event) => {
 
     studentProfile = {
       id,
-      name,
+      name: adminStudentRecord.name,
       email: adminStudentRecord.email,
       classSection: adminStudentRecord.classSection,
       password,
@@ -151,7 +156,8 @@ async function validateScannedQr(decodedText) {
 
   try {
     const payload = JSON.parse(decodedText);
-    const isFresh = Date.now() < payload.expiryMs;
+    const expiresAt = payload.expiresAt || payload.expiryMs;
+    const isFresh = Number.isFinite(expiresAt) && Date.now() < expiresAt;
 
     if (!isFresh) {
       studentStatus.textContent = 'QR expired. Ask teacher to regenerate.';
@@ -263,7 +269,8 @@ verifyFaceBtn.addEventListener('click', async () => {
         throw new Error('Session class mismatch.');
       }
 
-      const status = Date.now() > sessionData.expiresAt ? 'late' : 'present';
+      const sessionExpiry = sessionData.expiresAt || sessionData.expiryMs || 0;
+      const status = Date.now() > sessionExpiry ? 'late' : 'present';
 
       transaction.set(attendanceRef, {
         sessionId: scannedPayload.sessionId,
