@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel | SmartAttend</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="card auth-card" id="adminLoginCard">
+      <h2>Admin Login</h2>
+      <form id="adminLoginForm">
+        <label>Email</label>
+        <input type="email" id="adminEmail" required />
+        <label>Password</label>
+        <input type="password" id="adminPassword" required />
+        <button class="btn" type="submit">Login</button>
+      </form>
+      <p class="muted small">Demo credentials: admin@smartattend.com / admin123</p>
+    </section>
+
+    <section class="hidden" id="adminDashboard">
+      <header class="top-row">
+        <h1>Admin Dashboard</h1>
+        <button class="btn btn-outline" id="logoutAdminBtn">Logout</button>
+      </header>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Authorized Network</h3>
+          <form id="networkForm">
+            <label>Allowed device IP</label>
+            <input type="text" id="authorizedIp" value="192.168.1.15" required />
+            <button class="btn" type="submit">Save Network Rule</button>
+          </form>
+          <p class="muted small" id="networkStatus"></p>
+        </article>
+
+        <article class="card">
+          <h3>Manage Subjects</h3>
+          <form id="subjectForm">
+            <label>Subject code</label>
+            <input type="text" id="subjectCode" placeholder="CS101" required />
+            <label>Subject name</label>
+            <input type="text" id="subjectName" placeholder="Computer Fundamentals" required />
+            <button class="btn" type="submit">Add Subject</button>
+          </form>
+        </article>
+      </div>
+
+      <div class="grid-2 mt-16">
+        <article class="card">
+          <h3>Create Teacher Record</h3>
+          <form id="teacherRecordForm">
+            <label>Teacher ID</label>
+            <input type="text" id="teacherId" placeholder="TCH001" required />
+            <label>Name</label>
+            <input type="text" id="teacherName" required />
+            <label>Email</label>
+            <input type="email" id="teacherRecordEmail" required />
+            <label>Department / Subject</label>
+            <input type="text" id="teacherDepartment" required />
+            <button class="btn" type="submit">Save Teacher</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h3>Create Student Record</h3>
+          <form id="studentRecordForm">
+            <label>Student ID</label>
+            <input type="text" id="adminStudentId" placeholder="STU001" required />
+            <label>Name</label>
+            <input type="text" id="adminStudentName" required />
+            <label>Email</label>
+            <input type="email" id="adminStudentEmail" required />
+            <label>Class Section</label>
+            <input type="text" id="adminStudentClass" placeholder="CSE-A" required />
+            <button class="btn" type="submit">Save Student</button>
+          </form>
+        </article>
+      </div>
+
+      <div class="grid-2 mt-16">
+        <article class="card">
+          <h3>Assign Teacher Timetable</h3>
+          <form id="timetableForm">
+            <label>Class section</label>
+            <input type="text" id="classSection" placeholder="CSE-A" required />
+            <label>Subject code</label>
+            <input type="text" id="classSubject" placeholder="CS101" required />
+            <label>Teacher ID</label>
+            <input type="text" id="classTeacherId" placeholder="TCH001" required />
+            <label>Classroom</label>
+            <input type="text" id="classroom" placeholder="Room 204" required />
+            <label>Time slot</label>
+            <input type="text" id="timeSlot" placeholder="Mon 09:00-10:00" required />
+            <button class="btn" type="submit">Assign Class</button>
+          </form>
+        </article>
+
+        <article class="card">
+          <h3>Assign Student to Class</h3>
+          <form id="enrollmentForm">
+            <label>Student ID</label>
+            <input type="text" id="enrollStudentId" placeholder="STU001" required />
+            <label>Class section</label>
+            <input type="text" id="enrollClassSection" placeholder="CSE-A" required />
+            <button class="btn" type="submit">Assign Student</button>
+          </form>
+        </article>
+      </div>
+
+      <article class="card mt-16">
+        <h3>All Attendance Data</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Class</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Time</th>
+                <th>Teacher</th>
+              </tr>
+            </thead>
+            <tbody id="adminAttendanceBody"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
