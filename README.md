@@ -31,6 +31,7 @@ python3 -m http.server 5500
 For full Firebase persistence setup (Firestore collections, required indexes, rules, and verification), see:
 
 - [`FIREBASE_SETUP.md`](./FIREBASE_SETUP.md)
+- [`firestore.rules`](./firestore.rules)
 
 ## Data Model (Firestore)
 
