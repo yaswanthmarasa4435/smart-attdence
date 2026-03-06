@@ -31,6 +31,7 @@ const lateCount = document.getElementById('lateCount');
 const absentCount = document.getElementById('absentCount');
 const attendancePercent = document.getElementById('attendancePercent');
 const warningText = document.getElementById('warningText');
+const SESSION_DURATION_MS = 60_000;
 
 let teacherProfile = null;
 let assignedClasses = [];
@@ -93,15 +94,20 @@ generateQrBtn.addEventListener('click', async () => {
     return;
   }
 
+  if (!isClassLiveNow(selectedClass.timeSlot)) {
+    teacherStatus.textContent = 'QR can only be generated during this class timetable slot.';
+    return;
+  }
+
   const sessionId = crypto.randomUUID();
   const token = Math.random().toString(36).slice(2);
-  const expiryMs = Date.now() + 60_000;
+  const expiresAt = Date.now() + SESSION_DURATION_MS;
   const sessionDoc = doc(db, 'sessions', sessionId);
 
   activeSession = {
     sessionId,
     token,
-    expiryMs,
+    expiresAt,
     classId: selectedClass.classId,
     classSection: selectedClass.classSection,
     subjectCode: selectedClass.subjectCode,
@@ -109,7 +115,7 @@ generateQrBtn.addEventListener('click', async () => {
   };
 
   renderQr(activeSession);
-  startCountdown(expiryMs, sessionDoc);
+  startCountdown(expiresAt, sessionDoc);
   if (unsubscribeAttendance) unsubscribeAttendance();
   unsubscribeAttendance = listenAttendance(sessionId, selectedClass.classSection);
 
@@ -119,6 +125,7 @@ generateQrBtn.addEventListener('click', async () => {
       classroom: selectedClass.classroom,
       timeSlot: selectedClass.timeSlot,
       createdAt: serverTimestamp(),
+      createdAtMs: Date.now(),
       active: true,
     });
     teacherStatus.textContent = 'QR generated for assigned class.';
@@ -154,12 +161,39 @@ function startCountdown(expiryMs, sessionDoc) {
     if (left <= 0) {
       clearInterval(countdownRef);
       try {
-        await updateDoc(sessionDoc, { active: false });
+        await updateDoc(sessionDoc, { active: false, endedAtMs: Date.now() });
       } catch (error) {
         console.warn('Could not update session expiry in Firestore:', error);
       }
     }
   }, 500);
+}
+
+function isClassLiveNow(timeSlot) {
+  if (!timeSlot || typeof timeSlot !== 'string') return false;
+
+  const slotRegex = /^([A-Za-z]{3})\s+(\d{2}:\d{2})-(\d{2}:\d{2})$/;
+  const match = timeSlot.trim().match(slotRegex);
+  if (!match) return false;
+
+  const [, dayText, startText, endText] = match;
+  const dayMap = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
+  const slotDay = dayMap[dayText.toLowerCase()];
+  if (slotDay === undefined) return false;
+
+  const now = new Date();
+  if (now.getDay() !== slotDay) return false;
+
+  const toMinutes = (value) => {
+    const [hours, mins] = value.split(':').map(Number);
+    return hours * 60 + mins;
+  };
+
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const startMinutes = toMinutes(startText);
+  const endMinutes = toMinutes(endText);
+
+  return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
 }
 
 function listenAttendance(sessionId, classSection) {

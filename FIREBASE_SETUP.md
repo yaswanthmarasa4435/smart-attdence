@@ -18,6 +18,9 @@ This guide explains how to store **all app data in Firebase** for this prototype
 3. Start in **Test mode** for hackathon demo (you can lock later).
 4. Select a region close to you.
 
+> Important: SmartAttend uses **Cloud Firestore**, not Realtime Database.
+> Editing Realtime Database rules alone will not allow these writes.
+
 ---
 
 ## 3) (Optional but recommended) Enable Firebase Storage
@@ -172,3 +175,36 @@ Open:
 - `http://localhost:5500/teacher.html`
 - `http://localhost:5500/student.html`
 
+
+---
+
+## 11) If data is not stored (quick debug checklist)
+
+If form submit appears to work but Firestore has no new documents:
+
+1. **Use HTTP server, not file://**
+   - Always run: `python3 -m http.server 5500`
+   - Open `http://localhost:5500/admin.html`
+
+2. **Check browser console errors**
+   - Open DevTools console.
+   - Look for Firebase errors like:
+     - `permission-denied`
+     - `failed-precondition` (missing index)
+     - `unavailable` (network issue)
+
+3. **Confirm Firestore database is created in same project**
+   - Project ID in `js/firebase-config.js` must match Firebase console project.
+   - Firestore must be enabled for that project.
+
+4. **Set demo Firestore rules during hackathon**
+   - Use open demo rules in section 6 (`allow read, write: if true;`) until auth rules are implemented.
+
+5. **Verify new admin status messages**
+   - Admin page now shows exact save/load errors at top of dashboard and after every form action.
+
+6. **For attendance history queries**
+   - Create composite indexes listed in section 5 after first query failure message.
+
+7. **Do not configure only Realtime Database**
+   - Your screenshot/rules may be in Realtime Database, but this project writes to Cloud Firestore collections.
