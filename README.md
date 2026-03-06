@@ -1,67 +1,63 @@
 # SmartAttend (Hackathon Prototype)
 
-SmartAttend is a simple attendance prototype that uses dynamic QR codes + face verification + Firestore.
+SmartAttend is a hackathon-friendly attendance prototype with:
+- Controlled account creation via admin-approved IDs
+- Teacher timetable-based QR attendance sessions
+- Student QR scan + Face ID verification
+- Network-restricted attendance marking
+- Attendance history for students, teachers, and admin
 
-## Folder Structure
+## Pages
 
-```
-smart-attdence/
-├── index.html
-├── teacher.html
-├── student.html
-├── css/
-│   └── styles.css
-├── js/
-│   ├── firebase-config.js
-│   ├── teacher.js
-│   └── student.js
-└── models/
-```
+- `index.html` – launcher
+- `admin.html` – admin dashboard
+- `teacher.html` – teacher dashboard
+- `student.html` – student dashboard
 
 ## Setup
 
-1. Create a Firebase project.
-2. Enable Firestore database.
-3. Update `js/firebase-config.js` with your Firebase keys.
-4. Add face-api model files into `/models`:
-   - `tiny_face_detector_model-weights_manifest.json`
-   - `tiny_face_detector_model-shard1`
-5. Serve the project with a local server:
+1. Create a Firebase project and enable Firestore.
+2. Put your Firebase keys in `js/firebase-config.js`.
+3. Add face-api model files in `/models`:
+   - tiny face detector
+   - face landmark 68 net
+   - face recognition net
+4. Run local server:
 
 ```bash
 python3 -m http.server 5500
 ```
 
-6. Open:
-   - `http://localhost:5500/teacher.html`
-   - `http://localhost:5500/student.html`
+## Data Model (Firestore)
 
-## Firestore Collections
+### Admin-controlled records
+- `adminTeachers/{teacherID}`
+  - `teacherID`, `name`, `email`, `department`
+- `adminStudents/{studentID}`
+  - `studentID`, `name`, `email`, `classSection`
+- `subjects/{subjectCode}`
+- `classes/{classId}` for timetable assignment
+- `enrollments/{classSection_studentID}` for class membership
+- `system/networkPolicy`
+  - `allowedIp` (default `192.168.1.15`)
 
-### `students`
-- `id`
-- `name`
-- `photo`
+### Login profiles
+- `teacherProfiles/{teacherID}`
+- `studentProfiles/{studentID}`
+  - includes `facePhotoDataUrl`
 
-### `sessions`
-- `token`
-- `createdAt`
-- `expiresAt`
-- `active`
+### Attendance flow
+- `sessions/{sessionId}`
+  - generated only by teacher-assigned classes
+- `attendance/{sessionId_studentId}`
+  - includes class, subject, status, and device IP
 
-### `attendance`
-- `sessionId`
-- `studentId`
-- `studentName`
-- `timestamp`
-- `clientTimestamp`
-- `status` (`present` / `late`)
-- `deviceIP`
+## Core Rules Implemented
 
-## Demo Flow
-
-1. Teacher logs in and generates QR.
-2. Student logs in and scans QR.
-3. Face detection validates presence.
-4. Attendance is written to Firestore once per session per student.
-5. Teacher dashboard updates in real time.
+1. **Controlled account creation:** non-admin IDs cannot register/login.
+2. **Face ID enrollment:** required on student first profile setup.
+3. **Teacher timetable integration:** teacher can generate QR only for assigned classes.
+4. **Attendance history:** visible in student and teacher dashboards.
+5. **Network restriction:** attendance only when device IP matches authorized IP.
+6. **Admin panel:** create/manage teachers, students, timetable, subjects, enrollments, and view attendance.
+7. **Teacher attendance control:** sessions and marking are class-restricted and enrollment-checked.
