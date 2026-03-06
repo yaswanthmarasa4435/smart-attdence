@@ -1,0 +1,127 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isString(value, maxLen) {
+      return value is string && value.size() > 0 && value.size() <= maxLen;
+    }
+
+    function isTimestampOrNow(value) {
+      return value is timestamp || value == request.time;
+    }
+
+    // System settings
+    match /system/networkPolicy {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasOnly(['allowedIp', 'updatedAt'])
+                            && isString(request.resource.data.allowedIp, 64)
+                            && isTimestampOrNow(request.resource.data.updatedAt);
+    }
+
+    // Admin-managed master data
+    match /adminTeachers/{teacherID} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasOnly(['teacherID', 'name', 'email', 'department', 'createdAt'])
+                            && request.resource.data.teacherID == teacherID
+                            && isString(request.resource.data.teacherID, 32)
+                            && isString(request.resource.data.name, 120)
+                            && isString(request.resource.data.email, 120)
+                            && isString(request.resource.data.department, 120)
+                            && isTimestampOrNow(request.resource.data.createdAt);
+    }
+
+    match /adminStudents/{studentID} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasOnly(['studentID', 'name', 'email', 'classSection', 'createdAt'])
+                            && request.resource.data.studentID == studentID
+                            && isString(request.resource.data.studentID, 32)
+                            && isString(request.resource.data.name, 120)
+                            && isString(request.resource.data.email, 120)
+                            && isString(request.resource.data.classSection, 32)
+                            && isTimestampOrNow(request.resource.data.createdAt);
+    }
+
+    match /subjects/{subjectCode} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasOnly(['code', 'name', 'createdAt'])
+                            && request.resource.data.code == subjectCode
+                            && isString(request.resource.data.code, 32)
+                            && isString(request.resource.data.name, 120)
+                            && isTimestampOrNow(request.resource.data.createdAt);
+    }
+
+    match /classes/{classId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['classId', 'classSection', 'subjectCode', 'teacherID', 'classroom', 'timeSlot'])
+                            && request.resource.data.classId == classId
+                            && isString(request.resource.data.classId, 120)
+                            && isString(request.resource.data.classSection, 32)
+                            && isString(request.resource.data.subjectCode, 32)
+                            && isString(request.resource.data.teacherID, 32)
+                            && isString(request.resource.data.classroom, 120)
+                            && isString(request.resource.data.timeSlot, 60);
+    }
+
+    match /enrollments/{enrollmentID} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['studentID', 'classSection'])
+                            && isString(request.resource.data.studentID, 32)
+                            && isString(request.resource.data.classSection, 32);
+    }
+
+    // Runtime data
+    match /teacherProfiles/{teacherID} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['teacherID', 'password'])
+                            && request.resource.data.teacherID == teacherID
+                            && isString(request.resource.data.teacherID, 32)
+                            && isString(request.resource.data.password, 128);
+    }
+
+    match /studentProfiles/{studentID} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['password', 'facePhotoDataUrl'])
+                            && ((request.resource.data.id == studentID) || (request.resource.data.studentID == studentID))
+                            && isString(request.resource.data.password, 128)
+                            && isString(request.resource.data.facePhotoDataUrl, 2000000);
+    }
+
+    match /students/{studentID} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['id', 'name', 'classSection'])
+                            && request.resource.data.id == studentID
+                            && isString(request.resource.data.id, 32)
+                            && isString(request.resource.data.name, 120)
+                            && isString(request.resource.data.classSection, 32);
+    }
+
+    match /sessions/{sessionId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['sessionId', 'classSection', 'subjectCode', 'teacherID', 'active'])
+                            && request.resource.data.sessionId == sessionId
+                            && isString(request.resource.data.sessionId, 120)
+                            && isString(request.resource.data.classSection, 32)
+                            && isString(request.resource.data.subjectCode, 32)
+                            && isString(request.resource.data.teacherID, 32)
+                            && request.resource.data.active is bool;
+    }
+
+    match /attendance/{attendanceId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['sessionId', 'teacherID', 'subjectCode', 'classSection', 'studentId', 'studentName', 'clientTimestamp', 'status', 'deviceIP'])
+                            && isString(request.resource.data.sessionId, 120)
+                            && isString(request.resource.data.teacherID, 32)
+                            && isString(request.resource.data.subjectCode, 32)
+                            && isString(request.resource.data.classSection, 32)
+                            && isString(request.resource.data.studentId, 32)
+                            && isString(request.resource.data.studentName, 120)
+                            && request.resource.data.clientTimestamp is int
+                            && request.resource.data.status in ['present', 'late', 'absent']
+                            && isString(request.resource.data.deviceIP, 64);
+    }
+
+    // Block anything outside known collections.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -60,6 +60,44 @@ Create this document manually if needed:
 
 You can also create this from Admin panel after login.
 
+### Quick seed values (store all core demo data)
+
+Use these values in `admin.html` so all core collections are populated:
+
+- `subjects/CS101`
+  - `code`: `CS101`
+  - `name`: `Computer Fundamentals`
+- `adminTeachers/TCH001`
+  - `teacherID`: `TCH001`
+  - `name`: `Aarav Sharma`
+  - `email`: `aarav@smartattend.com`
+  - `department`: `Computer Science`
+- `adminStudents/STU001`
+  - `studentID`: `STU001`
+  - `name`: `Priya Nair`
+  - `email`: `priya@smartattend.com`
+  - `classSection`: `CSE-A`
+- `adminStudents/STU002`
+  - `studentID`: `STU002`
+  - `name`: `Rahul Verma`
+  - `email`: `rahul@smartattend.com`
+  - `classSection`: `CSE-A`
+- `classes/CSE-A_CS101_Mon-09:00-10:00`
+  - `classSection`: `CSE-A`
+  - `subjectCode`: `CS101`
+  - `teacherID`: `TCH001`
+  - `classroom`: `Room 204`
+  - `timeSlot`: `Mon 09:00-10:00`
+- `enrollments/CSE-A_STU001` and `enrollments/CSE-A_STU002`
+
+After teacher/student login + QR flow, runtime collections are auto-filled:
+
+- `teacherProfiles`
+- `studentProfiles`
+- `students`
+- `sessions`
+- `attendance`
+
 ---
 
 ## 5) Composite indexes needed
@@ -89,22 +127,25 @@ Because the app uses `where(...) + orderBy(...)`, create these Firestore composi
 
 ---
 
-## 6) Firestore Rules (hackathon prototype)
+## 6) Firestore Rules (recommended for this project)
 
-Use these demo rules first:
+This repo now includes a ready-to-paste rules file at:
 
-```js
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
-    }
-  }
-}
-```
+- `firestore.rules`
 
-> ⚠️ This is open access and only suitable for demo/hackathon.
+How to apply:
+
+1. Firebase Console → **Firestore Database** → **Rules**.
+2. Replace the default temporary rules with the content of `firestore.rules`.
+3. Click **Publish**.
+
+What these rules do:
+
+- Allow reads/writes only for **known SmartAttend collections**.
+- Validate key fields for each collection (`adminStudents`, `adminTeachers`, `classes`, `enrollments`, `sessions`, `attendance`, etc.).
+- Deny all unknown document paths by default.
+
+> Note: This prototype does not yet use Firebase Authentication, so rules are schema-based validation rules (not user identity-based role rules).
 
 ---
 
