@@ -7,6 +7,7 @@ import {
   getDocs,
   collection,
   query,
+  where,
   orderBy,
   limit,
 } from './firebase-config.js';
@@ -109,6 +110,22 @@ document.getElementById('timetableForm').addEventListener('submit', async (event
   const teacherID = document.getElementById('classTeacherId').value.trim().toUpperCase();
   const classroom = document.getElementById('classroom').value.trim();
   const timeSlot = document.getElementById('timeSlot').value.trim();
+
+  const [teacherSnap, subjectSnap] = await Promise.all([
+    getDoc(doc(db, 'adminTeachers', teacherID)),
+    getDoc(doc(db, 'subjects', subjectCode)),
+  ]);
+
+  if (!teacherSnap.exists()) {
+    alert('Teacher ID not found in admin records. Create teacher first.');
+    return;
+  }
+
+  if (!subjectSnap.exists()) {
+    alert('Subject code not found. Create subject first.');
+    return;
+  }
+
   const classId = `${classSection}_${subjectCode}_${timeSlot.replace(/\s+/g, '-')}`;
 
   await setDoc(doc(db, 'classes', classId), {
@@ -129,6 +146,26 @@ document.getElementById('enrollmentForm').addEventListener('submit', async (even
   event.preventDefault();
   const studentID = document.getElementById('enrollStudentId').value.trim().toUpperCase();
   const classSection = document.getElementById('enrollClassSection').value.trim().toUpperCase();
+
+  const [studentSnap, classSnap] = await Promise.all([
+    getDoc(doc(db, 'adminStudents', studentID)),
+    getDocs(query(collection(db, 'classes'), where('classSection', '==', classSection), limit(1))),
+  ]);
+
+  if (!studentSnap.exists()) {
+    alert('Student ID not found in admin records. Create student first.');
+    return;
+  }
+
+  if (studentSnap.data().classSection !== classSection) {
+    alert('Enrollment class must match the student class section in admin record.');
+    return;
+  }
+
+  if (classSnap.empty) {
+    alert('No timetable exists for this class section. Assign class first.');
+    return;
+  }
 
   await setDoc(doc(db, 'enrollments', `${classSection}_${studentID}`), {
     studentID,
