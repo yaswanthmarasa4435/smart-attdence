@@ -61,3 +61,40 @@ python3 -m http.server 5500
 5. **Network restriction:** attendance only when device IP matches authorized IP.
 6. **Admin panel:** create/manage teachers, students, timetable, subjects, enrollments, and view attendance.
 7. **Teacher attendance control:** sessions and marking are class-restricted and enrollment-checked.
+
+## Demo Data (for quick admin form entry)
+
+Use these values in `admin.html` to quickly set up a complete flow:
+
+- **Network rule**
+  - Allowed IP: `192.168.1.15`
+
+- **Subject**
+  - Subject code: `CS101`
+  - Subject name: `Computer Fundamentals`
+
+- **Teacher record**
+  - Teacher ID: `TCH001`
+  - Name: `Aarav Sharma`
+  - Email: `aarav@smartattend.com`
+  - Department/Subject: `Computer Science`
+
+- **Student records**
+  - Student 1: `STU001`, `Priya Nair`, `priya@smartattend.com`, class `CSE-A`
+  - Student 2: `STU002`, `Rahul Verma`, `rahul@smartattend.com`, class `CSE-A`
+
+- **Timetable assignment**
+  - Class section: `CSE-A`
+  - Subject code: `CS101`
+  - Teacher ID: `TCH001`
+  - Classroom: `Room 204`
+  - Time slot: `Mon 09:00-10:00`
+
+- **Enrollments**
+  - Assign `STU001` to `CSE-A`
+  - Assign `STU002` to `CSE-A`
+
+Then:
+1. Login in teacher panel with ID `TCH001` and set a password.
+2. Login in student panel with ID `STU001`/`STU002`, set passwords, and upload face images.
+3. Generate QR from teacher dashboard and scan from student dashboard.

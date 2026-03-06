@@ -26,8 +26,6 @@ const liveScanStatus = document.getElementById('liveScanStatus');
 const faceVideo = document.getElementById('faceVideo');
 const studentHistoryBody = document.getElementById('studentHistoryBody');
 
-const SCAN_THROTTLE_MS = 1500;
-
 let studentProfile = null;
 let adminStudentRecord = null;
 let scannedPayload = null;
