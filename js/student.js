@@ -12,11 +12,17 @@ const studentLoginCard = document.getElementById('studentLoginCard');
 const studentPanel = document.getElementById('studentPanel');
 const verifyFaceBtn = document.getElementById('verifyFaceBtn');
 const studentStatus = document.getElementById('studentStatus');
+const liveScanStatus = document.getElementById('liveScanStatus');
 const faceVideo = document.getElementById('faceVideo');
+
+const SCAN_THROTTLE_MS = 1500;
 
 let studentProfile = null;
 let scannedPayload = null;
 let qrScanner = null;
+let lastDecodedText = '';
+let lastScanAt = 0;
+let isValidatingQr = false;
 
 studentLoginForm.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -65,33 +71,53 @@ async function initScanner() {
       { facingMode: 'environment' },
       { fps: 10, qrbox: 220 },
       async (decodedText) => {
-        try {
-          const payload = JSON.parse(decodedText);
-          const isFresh = Date.now() < payload.expiryMs;
+        const now = Date.now();
+        if (isValidatingQr) return;
+        if (decodedText === lastDecodedText && now - lastScanAt < SCAN_THROTTLE_MS) return;
 
-          if (!isFresh) {
-            studentStatus.textContent = 'QR expired. Ask teacher to regenerate.';
-            return;
-          }
-
-          const sessionDoc = await getDoc(doc(db, 'sessions', payload.sessionId));
-          if (!sessionDoc.exists() || !sessionDoc.data().active || sessionDoc.data().token !== payload.token) {
-            studentStatus.textContent = 'Invalid session QR.';
-            return;
-          }
-
-          scannedPayload = payload;
-          verifyFaceBtn.disabled = false;
-          studentStatus.textContent = 'QR valid. Click verify to detect face.';
-          await qrScanner.stop();
-        } catch {
-          studentStatus.textContent = 'Could not read QR payload.';
-        }
+        lastDecodedText = decodedText;
+        lastScanAt = now;
+        await validateScannedQr(decodedText);
       },
     );
+
+    if (liveScanStatus) {
+      liveScanStatus.textContent = 'Live scan is active. Point the camera to teacher QR.';
+    }
   } catch (error) {
     console.error('Could not start QR scanner:', error);
     studentStatus.textContent = 'Camera access denied or unavailable for QR scanning.';
+  }
+}
+
+async function validateScannedQr(decodedText) {
+  isValidatingQr = true;
+
+  try {
+    const payload = JSON.parse(decodedText);
+    const isFresh = Date.now() < payload.expiryMs;
+
+    if (!isFresh) {
+      studentStatus.textContent = 'QR expired. Ask teacher to regenerate.';
+      return;
+    }
+
+    const sessionDoc = await getDoc(doc(db, 'sessions', payload.sessionId));
+    if (!sessionDoc.exists() || !sessionDoc.data().active || sessionDoc.data().token !== payload.token) {
+      studentStatus.textContent = 'Invalid session QR.';
+      return;
+    }
+
+    scannedPayload = payload;
+    verifyFaceBtn.disabled = false;
+    studentStatus.textContent = 'QR valid. Click verify to detect face.';
+    if (liveScanStatus) {
+      liveScanStatus.textContent = `Live session detected: ${payload.sessionId.slice(0, 8)}...`;
+    }
+  } catch {
+    studentStatus.textContent = 'Could not read QR payload.';
+  } finally {
+    isValidatingQr = false;
   }
 }
 
