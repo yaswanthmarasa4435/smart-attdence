@@ -9,15 +9,15 @@
 <body>
   <main class="container">
     <section class="card auth-card" id="teacherLoginCard">
-      <h2>Teacher Login</h2>
+      <h2>Teacher Login / Profile Setup</h2>
       <form id="teacherLoginForm">
-        <label>Email</label>
-        <input type="email" id="teacherEmail" required />
+        <label>Teacher ID</label>
+        <input type="text" id="teacherId" placeholder="TCH001" required />
         <label>Password</label>
         <input type="password" id="teacherPassword" required />
-        <button class="btn" type="submit">Login</button>
+        <button class="btn" type="submit">Continue</button>
       </form>
-      <p class="muted small">Demo credentials: teacher@smartattend.com / 123456</p>
+      <p class="muted small">Only IDs pre-created by admin can register/login.</p>
     </section>
 
     <section class="hidden" id="teacherDashboard">
@@ -26,12 +26,32 @@
         <button class="btn btn-outline" id="logoutTeacherBtn">Logout</button>
       </header>
 
-      <div class="grid-2">
+      <article class="card mt-16">
+        <h3>Assigned Timetable</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Class</th>
+                <th>Subject</th>
+                <th>Classroom</th>
+                <th>Time Slot</th>
+              </tr>
+            </thead>
+            <tbody id="timetableBody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <div class="grid-2 mt-16">
         <article class="card">
-          <h3>Active Session QR</h3>
+          <h3>Generate Attendance QR</h3>
+          <label>Choose assigned class</label>
+          <select id="classSelector"></select>
           <button class="btn" id="generateQrBtn">Generate QR (60s)</button>
           <div id="qrcode" class="qr-box"></div>
           <p id="qrTimer" class="muted">No active session</p>
+          <p id="teacherStatus" class="muted small"></p>
         </article>
 
         <article class="card">
@@ -51,12 +71,33 @@
             <thead>
               <tr>
                 <th>Student</th>
+                <th>Class</th>
+                <th>Subject</th>
                 <th>Time</th>
                 <th>Status</th>
                 <th>Device IP</th>
               </tr>
             </thead>
             <tbody id="attendanceTableBody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card mt-16">
+        <h3>Previous Sessions / Individual Records</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Session</th>
+                <th>Class</th>
+                <th>Subject</th>
+                <th>Student</th>
+                <th>Status</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
           </table>
         </div>
       </article>

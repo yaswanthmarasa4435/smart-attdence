@@ -7,22 +7,24 @@ import {
   setDoc,
   getDoc,
   getDocs,
+  addDoc,
   onSnapshot,
   query,
   where,
   orderBy,
+  limit,
   runTransaction,
   updateDoc,
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-// TODO: Replace with your Firebase project configuration before running the demo.
 const firebaseConfig = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_AUTH_DOMAIN',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_STORAGE_BUCKET',
-  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-  appId: 'YOUR_APP_ID',
+  apiKey: 'AIzaSyAI95FerJyyAL37kuP0uk0nUDCEL0VZQa4',
+  authDomain: 'smart-attendance-cbf53.firebaseapp.com',
+  projectId: 'smart-attendance-cbf53',
+  storageBucket: 'smart-attendance-cbf53.firebasestorage.app',
+  messagingSenderId: '320228804891',
+  appId: '1:320228804891:web:0b1624c30f158740e22bbe',
+  measurementId: 'G-RKXXP7V3N9',
 };
 
 const app = initializeApp(firebaseConfig);
@@ -36,10 +38,12 @@ export {
   setDoc,
   getDoc,
   getDocs,
+  addDoc,
   onSnapshot,
   query,
   where,
   orderBy,
+  limit,
   runTransaction,
   updateDoc,
 };
